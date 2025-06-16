@@ -30,8 +30,12 @@ export const getAllCompanions = async ({
   } else if (subject) {
     query = query.ilike("subject", `%${subject}%`);
   } else if (topic) {
-    query = query.or(`topic.ilike.%${topic}%, name.ilike.%${subject}%`);
+    query = query.or(`topic.ilike.%${topic}%, name.ilike.%${topic}%`);
   }
+
+  //else if(topic) {
+  //         query = query.or(`topic.ilike.%${topic}%,name.ilike.%${topic}%`)
+  //     }
 
   query = query.range((page - 1) * limit, page * limit - 1);
 
