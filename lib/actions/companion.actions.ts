@@ -33,10 +33,6 @@ export const getAllCompanions = async ({
     query = query.or(`topic.ilike.%${topic}%, name.ilike.%${topic}%`);
   }
 
-  //else if(topic) {
-  //         query = query.or(`topic.ilike.%${topic}%,name.ilike.%${topic}%`)
-  //     }
-
   query = query.range((page - 1) * limit, page * limit - 1);
 
   const { data: companions, error } = await query;
@@ -44,4 +40,16 @@ export const getAllCompanions = async ({
     throw new Error(error?.message || "Failed to get companions");
   }
   return companions;
+};
+
+export const getCompanion = async (id: string) => {
+  const supabase = createSupabaseClient();
+  const { data, error } = await supabase
+    .from("companions")
+    .select()
+    .eq("id", id);
+  if (error) {
+    throw new Error(error?.message || "Failed to get companions");
+  }
+  return data[0];
 };
