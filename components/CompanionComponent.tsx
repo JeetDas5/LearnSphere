@@ -51,7 +51,7 @@ const CompanionComponent = ({
       serverMessages: [],
     };
 
-    //@ts-expect-error
+    //@ts-expect-error typescript expect errors here
     await vapi.start(configureAssistant(voice, style), assistantOverrides);
   };
   const handleDisconnect = async () => {
