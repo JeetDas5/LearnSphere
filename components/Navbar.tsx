@@ -9,7 +9,13 @@ const Navbar = () => {
     <nav className="navbar">
       <Link href={"/"}>
         <div className="flex items-center gap-2.5 cursor-pointer">
-          <Image src="/images/logo.svg" alt="logo" width={46} height={44} />
+          <Image
+            src="/images/LearnSphereLogo.png"
+            alt="logo"
+            width={50}
+            height={50}
+          />
+          <p className="text-2xl max-sm:hidden font-bold">LearnSphere</p>
         </div>
       </Link>
       <div className="flex items-center gap-8">

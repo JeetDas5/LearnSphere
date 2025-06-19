@@ -3,6 +3,7 @@ import { addBookmark, removeBookmark } from "@/lib/actions/companion.actions";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 interface CompanionCardProps {
   id: string;
@@ -21,14 +22,18 @@ const CompanionCard = ({
   subject,
   duration,
   color,
-  bookmarked,
+  bookmarked: initialBookmarked,
 }: CompanionCardProps) => {
+  const [bookmarked, setBookmarked] = useState(initialBookmarked);
   const pathname = usePathname();
+
   const handleBookmark = async () => {
     if (bookmarked) {
       await removeBookmark(id, pathname);
+      setBookmarked(false);
     } else {
       await addBookmark(id, pathname);
+      setBookmarked(true);
     }
   };
   return (

@@ -27,7 +27,11 @@ const NavItems = () => {
         <Link
           href={href}
           key={label}
-          className={cn(pathname === href && "text-primary font-semibold")}
+          className={cn(
+            pathname === href
+              ? "text-primary font-semibold "
+              : "hover:text-primary hover:scale-105 hover:opacity-105",
+          )}
         >
           {label}
         </Link>

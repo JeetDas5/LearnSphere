@@ -19,33 +19,80 @@ export const createCompanion = async (formData: CreateCompanion) => {
   return data[0];
 };
 
+// export const getAllCompanions = async ({
+//   limit = 10,
+//   page = 1,
+//   subject,
+//   topic,
+// }: GetAllCompanions) => {
+//   const supabase = createSupabaseClient();
+//
+//   let query = supabase.from("companions").select();
+//
+//   if (subject && topic) {
+//     query = query
+//       .ilike("subject", `%${subject}%`)
+//       .or(`topic.ilike.%${topic}%,name.ilike.%${topic}%`);
+//   } else if (subject) {
+//     query = query.ilike("subject", `%${subject}%`);
+//   } else if (topic) {
+//     query = query.or(`topic.ilike.%${topic}%,name.ilike.%${topic}%`);
+//   }
+//
+//   query = query.range((page - 1) * limit, page * limit - 1);
+//
+//   const { data: companions, error } = await query;
+//
+//   if (error) throw new Error(error.message);
+//
+//   return companions;
+// };
+
 export const getAllCompanions = async ({
   limit = 10,
   page = 1,
   subject,
   topic,
 }: GetAllCompanions) => {
+  const { userId } = await auth();
   const supabase = createSupabaseClient();
 
-  let query = supabase.from("companions").select();
+  let companionQuery = supabase
+    .from("companions")
+    .select("*")
+    .range((page - 1) * limit, page * limit - 1);
 
   if (subject && topic) {
-    query = query
+    companionQuery = companionQuery
       .ilike("subject", `%${subject}%`)
       .or(`topic.ilike.%${topic}%,name.ilike.%${topic}%`);
   } else if (subject) {
-    query = query.ilike("subject", `%${subject}%`);
+    companionQuery = companionQuery.ilike("subject", `%${subject}%`);
   } else if (topic) {
-    query = query.or(`topic.ilike.%${topic}%,name.ilike.%${topic}%`);
+    companionQuery = companionQuery.or(
+      `topic.ilike.%${topic}%,name.ilike.%${topic}%`,
+    );
   }
 
-  query = query.range((page - 1) * limit, page * limit - 1);
+  const { data: companions, error: companionsError } = await companionQuery;
+  if (companionsError) throw new Error(companionsError.message);
 
-  const { data: companions, error } = await query;
+  // Fetch bookmarks for the current user
+  const { data: bookmarks, error: bookmarksError } = await supabase
+    .from("bookmarks")
+    .select("companion_id")
+    .eq("user_id", userId);
 
-  if (error) throw new Error(error.message);
+  if (bookmarksError) throw new Error(bookmarksError.message);
 
-  return companions;
+  const bookmarkedIds = new Set(bookmarks.map((b) => b.companion_id));
+
+  const modifiedCompanions = companions.map((companion) => ({
+    ...companion,
+    bookmarked: bookmarkedIds.has(companion.id),
+  }));
+
+  return modifiedCompanions;
 };
 
 export const getCompanion = async (id: string) => {
@@ -136,11 +183,7 @@ export const newCompanionPermission = async () => {
 
   const companionCount = data?.length;
 
-  if (companionCount >= limit) {
-    return false;
-  } else {
-    return true;
-  }
+  return companionCount < limit;
 };
 
 // Bookmarks
@@ -155,7 +198,6 @@ export const addBookmark = async (companionId: string, path: string) => {
   if (error) {
     throw new Error(error.message);
   }
-  // Revalidate the path to force a re-render of the page
 
   revalidatePath(path);
   return data;
@@ -177,16 +219,14 @@ export const removeBookmark = async (companionId: string, path: string) => {
   return data;
 };
 
-// It's almost the same as getUserCompanions, but it's for the bookmarked companions
 export const getBookmarkedCompanions = async (userId: string) => {
   const supabase = createSupabaseClient();
   const { data, error } = await supabase
     .from("bookmarks")
-    .select(`companions:companion_id (*)`) // Notice the (*) to get all the companion data
+    .select(`companions:companion_id (*)`)
     .eq("user_id", userId);
   if (error) {
     throw new Error(error.message);
   }
-  // We don't need the bookmark data, so we return only the companions
   return data.map(({ companions }) => companions);
 };
