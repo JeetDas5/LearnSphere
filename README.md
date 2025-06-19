@@ -10,7 +10,7 @@ educational experience tailored to your needs.
 
 This project is deployed on **vercel**.
 
-[LearnSphere](learnsphere.jeetdas.tech)
+[LearnSphere](https://learnsphere.jeetdas.tech)
 
 ---
 
