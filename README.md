@@ -92,7 +92,7 @@ Ensure the following are installed on your machine:
 
 * Git
 * Node.js
-* npm
+* NPM
 
 ---
 
