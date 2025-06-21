@@ -18,7 +18,7 @@ const Navbar = () => {
           <p className="text-2xl max-sm:hidden font-bold">LearnSphere</p>
         </div>
       </Link>
-      <div className="flex items-center gap-8">
+      <div className="flex items-center gap-0 md:gap-8">
         <NavItems />
         <SignedOut>
           <SignInButton>
